@@ -5,6 +5,19 @@ import { clsx } from "clsx";
 import { languages } from "./languages";
 import { getFarewellText } from "./utils";
 
+/**
+ * Backlog:
+ *
+ * ✅ Farewell messages in status section
+ * ✅ Disable the keyboard when the game is over
+ * - Fix a11y issues
+ * - Make the New Game button reset the game
+ * - Choose a random word from a list of words
+ * - Confetti drop when the user wins
+ *
+ * Challenge: Disable the keyboard when the game is over
+ */
+
 export default function AssemblyEndgame() {
 	// State values
 	const [currentWord, setCurrentWord] = useState("react");
@@ -71,6 +84,9 @@ export default function AssemblyEndgame() {
 			<button
 				className={className}
 				key={letter}
+				disabled={isGameOver}
+				aria-disabled={guessedLetters.includes(letter)}
+				aria-label={`Letter ${letter}`}
 				onClick={() => addGuessedLetter(letter)}
 			>
 				{letter.toUpperCase()}
@@ -123,13 +139,31 @@ export default function AssemblyEndgame() {
 				</p>
 			</header>
 
-			<section className={gameStatusClass}>
+			<section
+				aria-live="polite"
+				role="status"
+				className={gameStatusClass}
+			>
 				{renderGameStatus()}
 			</section>
 
 			<section className="language-chips">{languageElements}</section>
 
 			<section className="word">{letterElements}</section>
+
+			<section className="sr-only" aria-live="polite" role="status">
+				<p>
+					Current word:{" "}
+					{currentWord
+						.split("")
+						.map((letter) =>
+							guessedLetters.includes(letter)
+								? letter + "."
+								: "blank."
+						)
+						.join(" ")}
+				</p>
+			</section>
 
 			<section className="keyboard">{keyboardElements}</section>
 
